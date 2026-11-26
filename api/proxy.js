@@ -28,18 +28,23 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(url, {
       method: 'GET',
+      signal: AbortSignal.timeout(19000),
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       }
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
+    if (data === null) {
+      return res.status(502).json({ error: `Server API mengirim respons tidak valid (HTTP ${response.status})` });
+    }
 
     // 5. Kembalikan data dengan Header CORS terbuka
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
-    return res.status(200).json(data);
+    if (!response.ok && !data.error) data.error = data.message || `Server API error (HTTP ${response.status})`;
+    return res.status(response.status).json(data);
 
   } catch (error) {
     return res.status(500).json({ 
