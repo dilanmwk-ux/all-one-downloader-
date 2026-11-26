@@ -19,6 +19,7 @@ export default async function handler(req, res) {
     const parsedUrl = new URL(url);
     const allowedHosts = [
       'api.nexadev.my.id',
+      'api.ikyyxd.my.id',
       'www.tikwm.com',
       'tikwm.com'
     ];
