@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>All-In-One Downloader — Neobrutalism Media Utility</title>
+<meta name="description" content="Utilitas pengunduh cepat untuk Apple Music, Instagram, TikTok, Spotify, CapCut, MediaFire, Facebook, Pinterest, dan YouTube." />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f5ee;
+    --surface: #ffffff;
+    --surface-alt: #f0ede2;
+    --ink: #0f0f0f;
+    --ink-dim: #3f3f46;
+    --border-color: #000000;
+    --shadow-color: #000000;
+
+    --acid-lime: #b8ff01;
+    --electric-yellow: #ffd600;
+    --coral-pink: #ff5e7e;
+    --sky-cyan: #38bdf8;
+    --lavender: #c084fc;
+    --danger: #ff3b30;
+
+    --border-w: 2.5px;
+    --shadow-sm: 3px 3px 0px var(--shadow-color);
+    --shadow-md: 5px 5px 0px var(--shadow-color);
+    --shadow-lg: 7px 7px 0px var(--shadow-color);
+
+    --radius: 6px;
+    --container: 880px;
+
+    --font-display: 'Space Grotesk', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  body.dark {
+    --bg: #121212;
+    --surface: #1d1d1f;
+    --surface-alt: #262629;
+    --ink: #fafafa;
+    --ink-dim: #a1a1aa;
+    --border-color: #fafafa;
+    --shadow-color: #000000;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-display);
+    background-color: var(--bg);
+    background-image: radial-gradient(var(--border-color) 0.75px, transparent 0.75px);
+    background-size: 24px 24px;
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding-bottom: 48px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body.dark {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.14) 0.75px, transparent 0.75px);
+  }
+
+  button, input, select { font-family: inherit; }
+  button { cursor: pointer; border: none; background: none; color: inherit; }
+
+  .container {
+    width: 100%;
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 18px;
+  }
+
+  .mono { font-family: var(--font-mono); font-size: 0.76rem; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: var(--border-w) solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-inner {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .brand-box {
+    width: 34px;
+    height: 34px;
+    background: var(--acid-lime);
+    color: #000000;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    place-items: center;
+    font-size: 0.95rem;
+  }
+
+  .brand-pill {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    background: var(--electric-yellow);
+    color: #000000;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+  }
+
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+  .neo-btn {
+    height: 38px;
+    padding: 0 14px;
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    font-weight: 700;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .neo-btn:hover:not(:disabled) { background: var(--electric-yellow); color: #000000; }
+  .neo-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--shadow-color); }
+  .neo-btn.icon-only { width: 38px; padding: 0; }
+  .neo-btn.accent-cyan { background: var(--sky-cyan); color: #000000; }
+  .neo-btn.accent-cyan:hover:not(:disabled) { background: var(--acid-lime); }
+
+  .hero { padding: 36px 0 24px; }
+
+  .hero-stickers { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+
+  .sticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    color: #000000;
+  }
+
+  .sticker.lime { background: var(--acid-lime); }
+  .sticker.pink { background: var(--coral-pink); }
+  .sticker.cyan { background: var(--sky-cyan); }
+
+  .hero h1 {
+    font-size: clamp(1.85rem, 4.4vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    margin-bottom: 10px;
+  }
+
+  .hero p { font-size: 0.98rem; color: var(--ink-dim); max-width: 620px; }
+
+  .neo-card {
+    background: var(--surface);
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 26px;
+    overflow: hidden;
+  }
+
+  .card-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface-alt);
+    border-bottom: var(--border-w) solid var(--border-color);
+  }
+
+  .card-banner-title {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 18px 18px 0;
+  }
+
+  .service-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 12px 6px;
+    background: var(--surface);
+    color: var(--ink);
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.78rem;
+    font-weight: 700;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  }
+
+  .service-btn i { font-size: 1.25rem; }
+  .service-btn:hover { background: var(--surface-alt); transform: translate(-1px, -1px); box-shadow: 4px 4px 0px var(--shadow-color); }
+  .service-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--shadow-color); }
+  .service-btn.active { background: var(--acid-lime); color: #000000; transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--shadow-color); }
+
+  .form-body { padding: 18px; }
+  .url-row { display: flex; gap: 12px; align-items: stretch; }
+
+  .input-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 0 8px 0 14px;
+    height: 52px;
+    min-width: 0;
+  }
+
+  .input-box:focus-within { background: var(--surface); outline: 3px solid var(--electric-yellow); outline-offset: 1px; }
+
+  .input-tag {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 700;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  .input-box input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 0.94rem;
+    font-weight: 500;
+    outline: none;
+  }
+
+  .input-box input::placeholder { color: var(--ink-dim); opacity: 0.75; }
+  .input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  .mini-chip {
+    height: 32px;
+    padding: 0 10px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .mini-chip:hover { background: var(--electric-yellow); color: #000000; }
+  .mini-chip:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px var(--shadow-color); }
+  .mini-chip.icon { width: 32px; padding: 0; justify-content: center; }
+
+  .quality-select {
+    height: 28px;
+    padding: 0 8px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .quality-select:focus { outline: 2px solid var(--electric-yellow); }
+
+  .primary-submit {
+    height: 52px;
+    padding: 0 26px;
+    background: var(--acid-lime);
+    color: #000000;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    white-space: nowrap;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  }
+
+  .primary-submit:hover:not(:disabled) { background: var(--electric-yellow); }
+  .primary-submit:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 2px 2px 0px var(--shadow-color); }
+  .primary-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .helper-bar {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+
+  .helper-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .format-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink-dim);
+    background: var(--surface-alt);
+    padding: 4px 10px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .demo-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: var(--lavender);
+    color: #000000;
+    padding: 4px 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .demo-link:hover { background: var(--electric-yellow); }
+  .demo-link:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px var(--shadow-color); }
+
+  .result-body {
+    padding: 22px;
+    min-height: 164px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .empty-box {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px 16px;
+    text-align: center;
+    background: var(--bg);
+  }
+
+  .empty-box i { font-size: 1.6rem; margin-bottom: 8px; display: inline-block; }
+  .empty-box p { font-size: 0.88rem; color: var(--ink-dim); max-width: 440px; margin: 0 auto; }
+
+  .download-card {
+    display: grid;
+    grid-template-columns: 144px 1fr;
+    gap: 20px;
+    align-items: start;
+    animation: popIn 0.22s ease-out;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .thumb {
+    width: 144px;
+    height: 144px;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    background: var(--electric-yellow);
+    color: #000000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb i { font-size: 2.4rem; }
+
+  .dl-body { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+  .dl-badge-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+  .dl-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    background: var(--sky-cyan);
+    color: #000000;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+  }
+
+  .dl-kicker.yt { background: var(--coral-pink); }
+  .dl-kicker.slide { background: var(--electric-yellow); }
+
+  .dl-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .dl-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-dim);
+  }
+
+  .dl-meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .dl-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+
+  .dl-btn {
+    height: 40px;
+    padding: 0 16px;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  }
+
+  .dl-btn.primary-dl { background: var(--acid-lime); color: #000000; }
+  .dl-btn:hover { background: var(--electric-yellow); color: #000000; }
+  .dl-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--shadow-color); }
+
+  .error-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--coral-pink);
+    color: #000000;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  .error-box i { margin-top: 3px; flex-shrink: 0; }
+
+  .split-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 22px;
+    margin-bottom: 26px;
+  }
+
+  .split-grid .neo-card { margin-bottom: 0; display: flex; flex-direction: column; }
+  .history-controls { padding: 12px 14px 0; }
+
+  .history-search {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    outline: none;
+  }
+
+  .history-search:focus { outline: 2px solid var(--electric-yellow); }
+
+  .history-list {
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 270px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    background: var(--bg);
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+  }
+
+  .history-item:hover { background: var(--electric-yellow); color: #000000; }
+  .history-item i.srv-ico { width: 16px; text-align: center; flex-shrink: 0; }
+  .history-main { flex: 1; min-width: 0; }
+
+  .history-url {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .history-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    opacity: 0.8;
+  }
+
+  .history-del {
+    width: 26px;
+    height: 26px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+
+  .history-del:hover { background: var(--coral-pink); color: #000000; }
+  .history-empty { padding: 28px 12px; text-align: center; font-size: 0.84rem; color: var(--ink-dim); }
+
+  .spec-list { padding: 8px 16px 14px; display: flex; flex-direction: column; }
+
+  .spec-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.84rem;
+  }
+
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { font-weight: 700; }
+
+  .kbd-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    background: var(--surface-alt);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+  }
+
+  .faq-list { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .faq-item {
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .faq-q {
+    width: 100%;
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .faq-item.open .faq-q { background: var(--electric-yellow); color: #000000; border-bottom: 2px solid var(--border-color); }
+  .faq-q i { transition: transform 0.2s ease; flex-shrink: 0; }
+  .faq-item.open .faq-q i { transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+  .faq-item.open .faq-a { max-height: 180px; }
+  .faq-a p { padding: 14px 16px; font-size: 0.86rem; color: var(--ink-dim); line-height: 1.55; }
+
+  .toast {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 16px;
+    background: var(--acid-lime);
+    color: #000000;
+    border: var(--border-w) solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    font-size: 0.84rem;
+    font-weight: 700;
+    transform: translateY(160%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s ease, opacity 0.2s ease;
+    z-index: 100;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 820px) {
+    .service-grid { grid-template-columns: repeat(3, 1fr); }
+    .split-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .service-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 14px 0; }
+    .service-btn { padding: 10px 4px; font-size: 0.72rem; }
+    .form-body { padding: 14px; }
+    .url-row { flex-direction: column; }
+    .primary-submit { width: 100%; }
+    .download-card { grid-template-columns: 1fr; }
+    .thumb { width: 100%; height: 180px; }
+    .toast { left: 18px; right: 18px; justify-content: center; }
+  }
+
+  .brand > span { white-space: nowrap; }
+  .dl-btn.busy { opacity: 0.6; }
+  button:focus-visible, a:focus-visible, select:focus-visible { outline: 3px solid var(--sky-cyan); outline-offset: 2px; }
+
+  @media (max-width: 560px) {
+    .brand-pill, .input-tag { display: none; }
+    #demoNavBtn span { display: none; }
+    #demoNavBtn { width: 38px; padding: 0; }
+    .thumb { height: 300px; background: #000000; }
+    .thumb img { object-fit: contain; }
+    .thumb i { color: #ffffff; }
+    .dl-actions .dl-btn { flex: 1 1 100%; justify-content: center; height: 46px; }
+  }
+  /* Kolom link + tombol Paste & hapus */
+  .input-box { height: 60px; padding: 0 8px 0 14px; gap: 8px; }
+  .input-tag { margin-right: 2px; }
+  .input-box input { font-size: 1rem; text-overflow: ellipsis; }
+  .input-actions { gap: 8px; }
+  .input-actions .mini-chip {
+    height: 42px; padding: 0 14px; gap: 7px; justify-content: center;
+    border: var(--border-w) solid #000000; border-radius: var(--radius);
+    font-size: 0.8rem; line-height: 1; box-shadow: none;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .input-actions #pasteBtn { background: var(--electric-yellow); color: #000000; }
+  .input-actions #clearBtn { width: 42px; padding: 0; background: var(--coral-pink); color: #000000; font-size: 1rem; }
+  .input-actions .mini-chip:hover { filter: brightness(0.95); }
+  .input-actions .mini-chip:active { transform: scale(0.94); }
+  #urlInput:placeholder-shown ~ .input-actions #clearBtn { display: none; }
+  @media (max-width: 560px) {
+    .url-row .input-box { flex: 0 0 60px; }
+  }
+  /* Logo teks ALL IN ONE */
+  .wordmark { display: flex; flex-direction: column; gap: 4px; line-height: 1; white-space: nowrap; }
+  .wm-title { display: flex; align-items: center; gap: 5px; font-size: 1.2rem; font-weight: 900; letter-spacing: -0.02em; }
+  .wm-title i {
+    font-style: normal; font-size: 0.62em; font-weight: 800; letter-spacing: 0.04em;
+    padding: 3px 4px; background: var(--ink); color: var(--bg); border-radius: 3px;
+  }
+  .wm-title b {
+    font-weight: 900; padding: 2px 7px 3px; background: var(--acid-lime); color: #000000;
+    border: 2px solid #000000; border-radius: 4px; box-shadow: 2px 2px 0 var(--shadow-color);
+    transform: rotate(-3deg);
+  }
+  .wm-sub { font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.34em; color: var(--ink-dim); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .download-card { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-box"><i class="fas fa-arrow-down"></i></span>
+      <span class="wordmark" aria-label="All-In-One Downloader">
+        <span class="wm-title" aria-hidden="true">ALL<i>IN</i><b>ONE</b></span>
+        <span class="wm-sub" aria-hidden="true">DOWNLOADER</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <button class="neo-btn accent-cyan" id="demoNavBtn" title="Uji tampilan dengan data contoh">
+        <i class="fas fa-bolt"></i>
+        <span>Preview Demo</span>
+      </button>
+      <button class="neo-btn icon-only" id="themeToggle" title="Ganti tema terang/gelap" aria-label="Ganti tema">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-stickers">
+      <span class="sticker lime"><i class="fas fa-check"></i> 8 PLATFORM</span>
+      <span class="sticker cyan"><i class="fas fa-wand-magic-sparkles"></i> AUTO-DETECT URL</span>
+      <span class="sticker pink"><i class="fas fa-ban"></i> TANPA WATERMARK</span>
+    </div>
+    <h1>Unduh video, musik &amp; file langsung dari tautan.</h1>
+    <p>Tempel URL dari YouTube, Apple Music, Instagram, CapCut, TikTok, Spotify, MediaFire, Facebook, atau Pinterest. Layanan dipilih otomatis sesuai domain tautan.</p>
+  </section>
+
+  <section class="neo-card" aria-label="Workspace Pengunduh">
+    <div class="card-banner">
+      <span class="card-banner-title">
+        <i class="fas fa-layer-group"></i> 01 // PILIH LAYANAN &amp; MASUKKAN URL
+      </span>
+      <span class="mono" id="formatSpecBadge">FORMAT: MP3 / AUDIO</span>
+    </div>
+
+    <div class="service-grid" id="serviceGrid" role="tablist">
+      <button class="service-btn" role="tab" aria-selected="false" data-service="youtube" data-api="https://api.nexadev.my.id/api/ytmp4">
+        <i class="fab fa-youtube"></i><span>YouTube</span>
+      </button>
+      <button class="service-btn active" role="tab" aria-selected="true" data-service="apple" data-api="https://api.nexadev.my.id/api/applemusic">
+        <i class="fab fa-apple"></i><span>Apple Music</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="instagram" data-api="https://api.nexadev.my.id/api/sanapsave">
+        <i class="fab fa-instagram"></i><span>Instagram</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="capcut" data-api="https://api.nexadev.my.id/api/capcut">
+        <i class="fas fa-scissors"></i><span>CapCut</span>
+      </button>
+      <!-- Endpoint TikTok diganti ke TikWM -->
+      <button class="service-btn" role="tab" aria-selected="false" data-service="tiktok" data-api="https://www.tikwm.com/api">
+        <i class="fab fa-tiktok"></i><span>TikTok</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="spotify" data-api="https://api.nexadev.my.id/api/spotify">
+        <i class="fab fa-spotify"></i><span>Spotify</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="mediafire" data-api="https://api.nexadev.my.id/api/mediafire">
+        <i class="fas fa-fire"></i><span>MediaFire</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="facebook" data-api="https://api.ikyyxd.my.id/download/facebook">
+        <i class="fab fa-facebook"></i><span>Facebook</span>
+      </button>
+      <button class="service-btn" role="tab" aria-selected="false" data-service="pin" data-api="https://api.nexadev.my.id/api/pin">
+        <i class="fab fa-pinterest"></i><span>Pinterest</span>
+      </button>
+    </div>
+
+    <div class="form-body">
+      <div class="url-row">
+        <div class="input-box">
+          <span class="input-tag">HTTPS</span>
+          <input type="text" id="urlInput" placeholder="https://music.apple.com/us/song/..." inputmode="url" enterkeyhint="go" autocapitalize="off" autocomplete="off" spellcheck="false" aria-label="URL Tautan" />
+          <div class="input-actions">
+            <button type="button" class="mini-chip" id="pasteBtn" title="Tempel dari clipboard">
+              <i class="fas fa-paste"></i> Paste
+            </button>
+            <button type="button" class="mini-chip icon" id="clearBtn" title="Hapus input (Esc)" aria-label="Hapus">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="primary-submit" id="fetchBtn">
+          <i class="fas fa-arrow-right"></i>
+          <span>Download</span>
+        </button>
+      </div>
+
+      <div class="helper-bar">
+        <div class="format-pill" id="inputHint">
+          <i class="fas fa-link"></i>
+          <span>Contoh: https://music.apple.com/us/song/…</span>
+        </div>
+        <div class="helper-right">
+          <select id="qualitySelect" class="quality-select" style="display:none;" aria-label="Kualitas video YouTube" title="Kualitas video">
+            <option value="360p">360p</option>
+            <option value="480p">480p</option>
+            <option value="720p" selected>720p</option>
+            <option value="1080p">1080p</option>
+          </select>
+          <button type="button" class="demo-link" id="demoInlineBtn">
+            Uji Preview Hasil →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="neo-card" aria-live="polite">
+    <div class="card-banner">
+      <span class="card-banner-title">
+        <i class="fas fa-terminal"></i> 02 // HASIL EKSTRAKSI MEDIA
+      </span>
+      <span class="sticker lime" id="statusBadge" style="box-shadow: none; padding: 1px 8px;">STATUS: IDLE</span>
+    </div>
+    <div class="result-body" id="resultPanel">
+      <div class="empty-box">
+        <i class="fas fa-inbox"></i>
+        <p>Belum ada tautan yang diproses. Tempel URL di atas atau klik <strong>Preview Demo</strong> untuk melihat tampilan kartu unduhan.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="split-grid">
+    <div class="neo-card">
+      <div class="card-banner">
+        <span class="card-banner-title">
+          <i class="fas fa-clock-rotate-left"></i> RIWAYAT (<span id="historyCount">0</span>/20)
+        </span>
+        <button type="button" class="mini-chip" id="clearHistoryBtn" style="height: 26px; font-size: 0.68rem;">
+          Hapus Semua
+        </button>
+      </div>
+      <div class="history-controls">
+        <input type="text" id="historySearch" class="history-search" placeholder="Cari URL atau layanan di riwayat..." aria-label="Cari riwayat" />
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">Riwayat unduhan masih kosong.</div>
+      </div>
+    </div>
+
+    <div class="neo-card">
+      <div class="card-banner">
+        <span class="card-banner-title">
+          <i class="fas fa-keyboard"></i> PINTASAN &amp; INFO
+        </span>
+      </div>
+      <div class="spec-list">
+        <div class="spec-row"><span class="spec-key">Tempel Cepat</span><span class="kbd-tag">Ctrl / ⌘ + V</span></div>
+        <div class="spec-row"><span class="spec-key">Mulai Ekstraksi</span><span class="kbd-tag">Enter</span></div>
+        <div class="spec-row"><span class="spec-key">Bersihkan Input</span><span class="kbd-tag">Esc</span></div>
+        <div class="spec-row"><span class="spec-key">Batas Waktu API</span><span class="kbd-tag">20 Detik</span></div>
+        <div class="spec-row"><span class="spec-key">Penyimpanan</span><span class="kbd-tag">Browser Lokal</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="neo-card" id="faq" style="margin-bottom: 0;">
+    <div class="card-banner">
+      <span class="card-banner-title">
+        <i class="fas fa-circle-question"></i> PERTANYAAN UMUM (FAQ)
+      </span>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button type="button" class="faq-q">Apakah layanan ini gratis dan tanpa batas? <i class="fas fa-plus"></i></button>
+        <div class="faq-a"><p>Ya, sepenuhnya gratis tanpa pendaftaran akun atau batasan kuota harian. Semua tautan diproses langsung melalui endpoint API.</p></div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q">Bagaimana cara kerja deteksi platform otomatis? <i class="fas fa-plus"></i></button>
+        <div class="faq-a"><p>Saat Anda menempelkan tautan (misalnya link YouTube, TikTok, Spotify, atau MediaFire), sistem otomatis mengenali domain tautan dan memindahkan tab layanan yang sesuai.</p></div>
+      </div>
+      <div class="faq-item">
+        <button type="button" class="faq-q">Apakah bisa mengunduh slide foto TikTok? <i class="fas fa-plus"></i></button>
+        <div class="faq-a"><p>Bisa! Jika postingan TikTok berupa slideshow foto, sistem akan menampilkan tombol unduh untuk masing-masing gambar serta audio latarnya.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="fas fa-check" id="toastIcon"></i>
+  <span id="toastText">Berhasil</span>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const serviceGrid     = document.getElementById('serviceGrid');
+  const urlInput        = document.getElementById('urlInput');
+  const fetchBtn        = document.getElementById('fetchBtn');
+  const resultPanel     = document.getElementById('resultPanel');
+  const statusBadge     = document.getElementById('statusBadge');
+  const formatSpecBadge = document.getElementById('formatSpecBadge');
+  const pasteBtn        = document.getElementById('pasteBtn');
+  const clearBtn        = document.getElementById('clearBtn');
+  const themeToggle     = document.getElementById('themeToggle');
+  const themeIcon       = document.getElementById('themeIcon');
+  const inputHint       = document.getElementById('inputHint');
+  const historyList     = document.getElementById('historyList');
+  const historyCount    = document.getElementById('historyCount');
+  const historySearch   = document.getElementById('historySearch');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const demoNavBtn      = document.getElementById('demoNavBtn');
+  const demoInlineBtn   = document.getElementById('demoInlineBtn');
+  const qualitySelect   = document.getElementById('qualitySelect');
+  const toast           = document.getElementById('toast');
+  const toastIcon       = document.getElementById('toastIcon');
+  const toastText       = document.getElementById('toastText');
+
+  let currentService = 'apple';
+  let currentApi     = 'https://api.nexadev.my.id/api/applemusic';
+  let history        = [];
+
+  const placeholders = {
+    youtube:   'https://www.youtube.com/watch?v=…',
+    apple:     'https://music.apple.com/us/song/…',
+    instagram: 'https://www.instagram.com/reel/…',
+    capcut:    'https://www.capcut.com/tv2/…',
+    tiktok:    'https://vt.tiktok.com/…',
+    spotify:   'https://open.spotify.com/track/…',
+    mediafire: 'https://www.mediafire.com/file/…',
+    facebook:  'https://www.facebook.com/share/v/…',
+    pin:       'https://pin.it/…'
+  };
+
+  const formatSpecs = {
+    youtube:   'FORMAT: MP4 VIDEO / AUDIO',
+    apple:     'FORMAT: MP3 / PREVIEW',
+    instagram: 'FORMAT: MP4 REELS / JPG',
+    capcut:    'FORMAT: MP4 NO WATERMARK',
+    tiktok:    'FORMAT: MP4 / SLIDE FOTO',
+    spotify:   'FORMAT: MP3 320KBPS',
+    mediafire: 'FORMAT: ORIGINAL FILE',
+    facebook:  'FORMAT: MP4 HD / SD / MP3',
+    pin:       'FORMAT: HD IMAGE / PIN'
+  };
+
+  const serviceNames = {
+    youtube: 'YouTube', apple: 'Apple Music', instagram: 'Instagram', capcut: 'CapCut',
+    tiktok: 'TikTok', spotify: 'Spotify', mediafire: 'MediaFire', facebook: 'Facebook', pin: 'Pinterest'
+  };
+
+  const serviceIcons = {
+    youtube: 'fab fa-youtube', apple: 'fab fa-apple', instagram: 'fab fa-instagram', capcut: 'fas fa-scissors',
+    tiktok: 'fab fa-tiktok', spotify: 'fab fa-spotify', mediafire: 'fas fa-fire', facebook: 'fab fa-facebook', pin: 'fab fa-pinterest'
+  };
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('#demo-')) {
+      return escapeHtml(trimmed);
+    }
+    return '';
+  }
+
+  const demoPayloads = {
+    youtube: {
+      url: 'https://youtu.be/gQmLrZw5Jlg',
+      data: {
+        author: 'NexaDev',
+        status: true,
+        id: 'gQmLrZw5Jlg',
+        title: '100 Days of Minecraft Verity Container Anomaly',
+        thumbnail: 'https://i.ytimg.com/vi/gQmLrZw5Jlg/hqdefault.jpg',
+        duration: '2529 (42:09)',
+        fduration: '42:09',
+        channel: 'PaYuDan',
+        views: '7.026.687',
+        publish: '2026-7-27 (4 months ago)',
+        data: { filename: '...', quality: '720p', size: '926 MB', extension: 'mp4', url: 'https://youtu.be/gQmLrZw5Jlg' }
+      }
+    },
+    apple: {
+      url: 'https://music.apple.com/us/song/starboy/1440871397',
+      data: { status: true, data: { title: 'Starboy (feat. Daft Punk)', album: 'Starboy', published: '2016', thumbnail: 'https://placehold.co/300x300/b8ff01/000000?text=APPLE+MUSIC', audio: { url: 'https://music.apple.com/us/song/starboy/1440871397' }, preview: 'https://music.apple.com/us/song/starboy/1440871397', source: 'https://music.apple.com/us/song/starboy/1440871397' } }
+    },
+    instagram: {
+      url: 'https://www.instagram.com/reel/C8xDemoReel/',
+      data: { ok: true, meta: { caption: 'Eksplorasi arsitektur brutalist & pencahayaan alami.' }, media: { image: [{ url: 'https://placehold.co/300x300/ff5e7e/000000?text=INSTAGRAM' }], video: [{ url: 'https://www.instagram.com/reel/C8xDemoReel/' }] } }
+    },
+    capcut: {
+      url: 'https://www.capcut.com/tv2/ZSYDemoTemplate/',
+      data: { status: true, caption: 'Template Cinematic Color Grading 60FPS', data: { url: 'https://www.capcut.com/tv2/ZSYDemoTemplate/' } }
+    },
+    // Demo payload TikTok disesuaikan dengan format TikWM (Slide Foto)
+    tiktok: {
+      url: 'https://vt.tiktok.com/ZSYDemoTikTok/',
+      data: {
+        code: 0,
+        msg: "success",
+        data: {
+          title: 'Slide foto aesthetic 2026 — cek caption',
+          cover: 'https://placehold.co/300x300/38bdf8/000000?text=TIKTOK+COVER',
+          images: [
+            'https://placehold.co/300x300/ff5e7e/000000?text=SLIDE+1',
+            'https://placehold.co/300x300/38bdf8/000000?text=SLIDE+2',
+            'https://placehold.co/300x300/b8ff01/000000?text=SLIDE+3'
+          ],
+          play: 'https://www.tikwm.com/video/media/play/123.mp4',
+          music: 'https://www.tikwm.com/video/music/123.mp3'
+        }
+      }
+    },
+    spotify: {
+      url: 'https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB',
+      data: { status: true, data: { title: 'Midnight City', artist: 'M83', duration: '04:03', thumbnail: 'https://placehold.co/300x300/b8ff01/000000?text=SPOTIFY', url: 'https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB', preview: 'https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB' } }
+    },
+    mediafire: {
+      url: 'https://www.mediafire.com/file/demo123/Neobrutalism_UI_Kit.zip/file',
+      data: { status: true, data: { title: 'Neobrutalism_UI_Kit_v2.zip', size: '48.6 MB', mime: 'application/zip', url: 'https://www.mediafire.com/file/demo123/Neobrutalism_UI_Kit.zip/file' } }
+    },
+    facebook: {
+      url: 'https://www.facebook.com/watch/?v=123456789',
+      data: { status: true, result: { metadata: { description: 'Contoh video Facebook', author: 'Demo', duration: '29s', viewCount: 44921, resolution: '1080*1920' }, downloads: { thumbnail: 'https://placehold.co/300x300/38bdf8/000000?text=FACEBOOK', links: [
+        { quality: '720p', type: 'HD', url: '#demo-hd' }, { quality: '360p', type: 'SD', url: '#demo-sd' }, { quality: 'Mp3', type: 'Audio', url: '#demo-mp3' } ] } } }
+    },
+    pin: {
+      url: 'https://pin.it/demoPin2026',
+      data: { status: true, data: [ { url: 'https://placehold.co/300x300/ffd600/000000?text=PINTEREST+HD' } ] }
+    }
+  };
+
+  function showToast(msg, icon = 'fa-check') {
+    toastText.textContent = msg;
+    toastIcon.className = 'fas ' + icon;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  function copyTextToClipboard(text) {
+    if (!text) return;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => showToast('Link unduhan disalin!', 'fa-copy'))
+        .catch(() => fallbackCopy(text));
+    } else fallbackCopy(text);
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Link unduhan disalin!', 'fa-copy'); }
+    catch { showToast('Gagal menyalin link', 'fa-circle-exclamation'); }
+    document.body.removeChild(ta);
+  }
+
+  function setStatus(label, bgVar = 'var(--acid-lime)') {
+    statusBadge.textContent = 'STATUS: ' + label;
+    statusBadge.style.background = bgVar;
+    statusBadge.style.color = '#000000';
+  }
+
+  function setLoading(on) {
+    fetchBtn.disabled = on;
+    fetchBtn.innerHTML = on
+      ? '<span>Memproses...</span>'
+      : '<i class="fas fa-arrow-right"></i><span>Download</span>';
+    if (on) setStatus('FETCHING', 'var(--electric-yellow)');
+  }
+
+  function emptyResult(msg = 'Belum ada tautan yang diproses. Tempel URL di atas atau klik Preview Demo untuk melihat tampilan kartu unduhan.') {
+    setStatus('IDLE', 'var(--acid-lime)');
+    resultPanel.innerHTML = `<div class="empty-box"><i class="fas fa-inbox"></i><p>${escapeHtml(msg)}</p></div>`;
+  }
+
+  function errorResult(msg) {
+    setStatus('ERROR', 'var(--coral-pink)');
+    resultPanel.innerHTML = `<div class="error-box"><i class="fas fa-triangle-exclamation"></i><span>${escapeHtml(msg)}</span></div>`;
+    return resultPanel.innerHTML;
+  }
+
+  function activateService(name) {
+    const btn = serviceGrid.querySelector(`.service-btn[data-service="${name}"]`);
+    if (!btn) return;
+    serviceGrid.querySelectorAll('.service-btn').forEach(el => {
+      el.classList.remove('active');
+      el.setAttribute('aria-selected', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    currentService = btn.dataset.service;
+    currentApi     = btn.dataset.api;
+    inputHint.querySelector('span').textContent = 'Contoh: ' + (placeholders[currentService] || 'https://...');
+    formatSpecBadge.textContent = formatSpecs[currentService] || 'FORMAT: DIRECT';
+    urlInput.placeholder = placeholders[currentService] || 'Tempel link di sini…';
+    qualitySelect.style.display = (currentService === 'youtube') ? 'inline-block' : 'none';
+  }
+
+  serviceGrid.addEventListener('click', e => {
+    const btn = e.target.closest('.service-btn');
+    if (btn) activateService(btn.dataset.service);
+  });
+
+  function extractUrl(text) {
+    const t = String(text || '').trim();
+    const found = t.match(/https?:\/\/[^\s"'<>]+/i);
+    if (found) return found[0].replace(/[.,!;)\]]+$/, '');
+    return !/\s/.test(t) && detectService('https://' + t) ? 'https://' + t : t;
+  }
+
+  function detectService(url) {
+    let h;
+    try { h = new URL(/^https?:\/\//i.test(url) ? url : 'https://' + url).hostname.toLowerCase(); } catch { return null; }
+    const is = (...domains) => domains.some(d => h === d || h.endsWith('.' + d));
+    if (is('youtube.com', 'youtu.be', 'm.youtube.com')) return 'youtube';
+    if (is('music.apple.com', 'itunes.apple.com')) return 'apple';
+    if (is('instagram.com', 'instagr.am'))         return 'instagram';
+    if (is('capcut.com', 'capcut.net'))            return 'capcut';
+    if (is('tiktok.com'))                          return 'tiktok';
+    if (is('spotify.com', 'spotify.link'))         return 'spotify';
+    if (is('mediafire.com'))                       return 'mediafire';
+    if (is('facebook.com', 'fb.watch', 'fb.com'))  return 'facebook';
+    if (is('pin.it') || /(^|\.)pinterest\.[a-z.]+$/.test(h)) return 'pin';
+    return null;
+  }
+
+  urlInput.addEventListener('input', () => {
+    const detected = detectService(urlInput.value);
+    if (detected && detected !== currentService) activateService(detected);
+  });
+
+  function thumbHtml(src, fallbackIcon) {
+    const cleanSrc = safeUrl(src);
+    if (!cleanSrc) return `<div class="thumb"><i class="${fallbackIcon}"></i></div>`;
+    return `
+      <div class="thumb">
+        <img src="${cleanSrc}" alt="Thumbnail" referrerpolicy="no-referrer" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <i class="${fallbackIcon}" style="display:none;"></i>
+      </div>`;
+  }
+
+  function copyBtnHtml(url) {
+    const clean = safeUrl(url);
+    if (!clean) return '';
+    return `<button type="button" class="dl-btn copy-dl-btn" data-copy-url="${clean}"><i class="fas fa-copy"></i> Salin Link</button>`;
+  }
+
+  /* ============ RENDERERS ============ */
+
+  function renderYoutube(json) {
+    if (!json) return errorResult('Respons YouTube tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari YouTube.');
+
+    const d = json.data || json.result;
+    const dlUrl = safeUrl(d?.url);
+    if (!dlUrl) return errorResult('Format respons YouTube tidak dikenali atau URL unduhan tidak tersedia.');
+
+    const meta = [];
+    if (json.channel)  meta.push(`<span><i class="fas fa-user"></i>${escapeHtml(json.channel)}</span>`);
+    if (json.fduration || json.duration) meta.push(`<span><i class="fas fa-clock"></i>${escapeHtml(json.fduration || json.duration)}</span>`);
+    if (json.views)    meta.push(`<span><i class="fas fa-eye"></i>${escapeHtml(json.views)} views</span>`);
+    if (d.size)        meta.push(`<span><i class="fas fa-weight-hanging"></i>${escapeHtml(d.size)}</span>`);
+    if (d.quality)     meta.push(`<span><i class="fas fa-film"></i>${escapeHtml(d.quality)}</span>`);
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(json.thumbnail, 'fab fa-youtube')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker yt">YOUTUBE</span></div>
+          <div class="dl-title">${escapeHtml(json.title || 'YouTube Video')}</div>
+          <div class="dl-meta">${meta.join('')}</div>
+          <div class="dl-actions">
+            <a class="dl-btn primary-dl js-dl" href="${dlUrl}"><i class="fas fa-download"></i> Unduh Video</a>
+            ${copyBtnHtml(dlUrl)}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderApple(json) {
+    if (!json) return errorResult('Respons Apple Music tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari Apple Music.');
+    const d = json.data || json.result || json;
+    if (!d || (!d.title && !d.audio && !d.preview && !d.source)) return errorResult('Format respons Apple Music tidak dikenali.');
+
+    const audioUrl = safeUrl(d.audio?.url);
+    const prevUrl  = safeUrl(d.preview);
+    const srcUrl   = safeUrl(d.source);
+    const primaryUrl = audioUrl || prevUrl || srcUrl;
+
+    const links = [
+      audioUrl && `<a class="dl-btn primary-dl js-dl" href="${audioUrl}"><i class="fas fa-download"></i> Unduh MP3</a>`,
+      prevUrl  && `<a class="dl-btn" href="${prevUrl}" target="_blank" rel="noopener noreferrer"><i class="fas fa-play"></i> Preview</a>`,
+      srcUrl   && `<a class="dl-btn" href="${srcUrl}" target="_blank" rel="noopener noreferrer"><i class="fas fa-music"></i> Sumber</a>`,
+      primaryUrl && copyBtnHtml(primaryUrl)
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(d.thumbnail, 'fas fa-music')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">APPLE MUSIC</span></div>
+          <div class="dl-title">${escapeHtml(d.title || 'Unknown Track')}</div>
+          <div class="dl-meta">
+            ${d.album     ? `<span><i class="fas fa-compact-disc"></i>${escapeHtml(d.album)}</span>` : ''}
+            ${d.published ? `<span><i class="fas fa-calendar"></i>${escapeHtml(d.published)}</span>` : ''}
+          </div>
+          <div class="dl-actions">${links || '<span class="mono">Tidak ada link unduhan.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderInstagram(json) {
+    if (!json) return errorResult('Respons Instagram tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari Instagram.');
+    const d = json.data || json.result || json;
+    if (!d || (!d.media && !d.links)) return errorResult('Format respons Instagram tidak dikenali.');
+
+    const images = Array.isArray(d.media?.image) ? d.media.image : [];
+    const videos = Array.isArray(d.media?.video) ? d.media.video : [];
+    const caption = d.meta?.caption || d.caption || 'Postingan Instagram';
+    const thumb = images[0]?.url || d.thumbnail || '';
+    let actions = '';
+    let firstValidUrl = '';
+
+    videos.forEach((v, i) => {
+      const u = safeUrl(v?.url);
+      if (u) { if (!firstValidUrl) firstValidUrl = u; actions += `<a class="dl-btn ${!actions ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas fa-video"></i> Video ${i+1}</a>`; }
+    });
+    images.forEach((img, i) => {
+      const u = safeUrl(img?.url);
+      if (u) { if (!firstValidUrl) firstValidUrl = u; actions += `<a class="dl-btn ${!actions ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas fa-image"></i> Gambar ${i+1}</a>`; }
+    });
+    if (!actions && Array.isArray(d.links)) {
+      d.links.forEach((l, i) => {
+        const u = safeUrl(l);
+        if (u) { if (!firstValidUrl) firstValidUrl = u; actions += `<a class="dl-btn ${!actions ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas fa-download"></i> Media ${i+1}</a>`; }
+      });
+    }
+    if (firstValidUrl) actions += copyBtnHtml(firstValidUrl);
+
+    const shortCaption = caption.length > 90 ? caption.slice(0, 90) + '…' : caption;
+    return `
+      <div class="download-card">
+        ${thumbHtml(thumb, 'fab fa-instagram')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">INSTAGRAM</span></div>
+          <div class="dl-title">${escapeHtml(shortCaption)}</div>
+          <div class="dl-meta">
+            ${videos.length ? `<span><i class="fas fa-video"></i>${videos.length} video</span>` : ''}
+            ${images.length ? `<span><i class="fas fa-images"></i>${images.length} gambar</span>` : ''}
+          </div>
+          <div class="dl-actions">${actions || '<span class="mono">Tidak ada media ditemukan.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderCapcut(json) {
+    if (!json) return errorResult('Respons CapCut tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari CapCut.');
+    const d = json.data || json.result || json;
+    if (!d || (!d.url && !d.caption)) return errorResult('Format respons CapCut tidak dikenali.');
+
+    const url = safeUrl(d.url);
+    return `
+      <div class="download-card">
+        ${thumbHtml(d.thumbnail || '', 'fas fa-scissors')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">CAPCUT</span></div>
+          <div class="dl-title">${escapeHtml(d.caption || 'Video CapCut')}</div>
+          <div class="dl-meta"><span><i class="fas fa-film"></i>Tanpa Watermark</span></div>
+          <div class="dl-actions">
+            ${url ? `<a class="dl-btn primary-dl js-dl" href="${url}"><i class="fas fa-download"></i> Unduh Video</a>${copyBtnHtml(url)}`
+                  : '<span class="mono">Tidak ada link unduhan.</span>'}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // RENDERER TIKTOK BARU (Mendukung Video + Slide Foto)
+  function renderTikTok(json) {
+    if (!json) return errorResult('Respons TikTok tidak valid.');
+    // TikWM menggunakan code 0 untuk sukses
+    if (json.code !== 0 || !json.data) return errorResult(json.msg || 'Gagal mengambil data dari TikTok.');
+
+    const d = json.data;
+    const isSlide = Array.isArray(d.images) && d.images.length > 0;
+    const cover = d.cover || (isSlide ? d.images[0] : '');
+    let actions = '';
+    let firstUrl = '';
+
+    if (isSlide) {
+      d.images.forEach((imgUrl, i) => {
+        const u = safeUrl(imgUrl);
+        if (u) {
+          if (!firstUrl) firstUrl = u;
+          actions += `<a class="dl-btn ${!actions ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas fa-image"></i> Foto ${i+1}</a>`;
+        }
+      });
+      const musicUrl = safeUrl(d.music);
+      if (musicUrl) {
+        actions += `<a class="dl-btn js-dl" href="${musicUrl}"><i class="fas fa-music"></i> Unduh Audio</a>`;
+      }
+    } else {
+      const videoUrl = safeUrl(d.play);
+      const musicUrl = safeUrl(d.music);
+      if (videoUrl) {
+        firstUrl = videoUrl;
+        actions += `<a class="dl-btn primary-dl js-dl" href="${videoUrl}"><i class="fas fa-film"></i> Video HD</a>`;
+      }
+      if (musicUrl) {
+        actions += `<a class="dl-btn js-dl" href="${musicUrl}"><i class="fas fa-music"></i> Unduh Audio</a>`;
+      }
+    }
+
+    if (firstUrl) actions += copyBtnHtml(firstUrl);
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(cover, 'fab fa-tiktok')}
+        <div class="dl-body">
+          <div class="dl-badge-row">
+            <span class="dl-kicker">TIKTOK</span>
+            ${isSlide ? '<span class="dl-kicker slide">SLIDE FOTO</span>' : ''}
+          </div>
+          <div class="dl-title">${escapeHtml(d.title || 'Media TikTok')}</div>
+          <div class="dl-meta">
+            <span><i class="fab fa-tiktok"></i>${isSlide ? d.images.length + ' foto ditemukan' : 'Video siap diunduh'}</span>
+          </div>
+          <div class="dl-actions">${actions || '<span class="mono">Tidak ada media ditemukan.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderSpotify(json) {
+    if (!json) return errorResult('Respons Spotify tidak valid.');
+    if (json.status === false || json.success === false) return errorResult(json.message || json.error || 'Gagal mengambil data dari Spotify.');
+    const d = json.data || json.result || json;
+    if (!d || (!d.title && !d.track)) return errorResult('Format respons Spotify tidak dikenali.');
+
+    const dlUrl = safeUrl(d.url || d.download_url || d.link || d.audio);
+    const pvUrl = safeUrl(d.preview || d.preview_url || d.audio);
+    const primaryUrl = dlUrl || pvUrl;
+    const title = d.title || d.track || 'Unknown Track';
+    const artist = d.artist || d.artists || '';
+    const thumbnail = d.thumbnail || d.cover || d.image || '';
+    const duration = d.duration || '';
+
+    const links = [
+      dlUrl && `<a class="dl-btn primary-dl js-dl" href="${dlUrl}"><i class="fas fa-download"></i> Unduh MP3</a>`,
+      pvUrl && `<a class="dl-btn" href="${pvUrl}" target="_blank" rel="noopener noreferrer"><i class="fas fa-play"></i> Preview</a>`,
+      primaryUrl && copyBtnHtml(primaryUrl)
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(thumbnail, 'fab fa-spotify')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">SPOTIFY</span></div>
+          <div class="dl-title">${escapeHtml(title)}</div>
+          <div class="dl-meta">
+            ${artist ? `<span><i class="fas fa-user"></i>${escapeHtml(artist)}</span>` : ''}
+            ${duration ? `<span><i class="fas fa-clock"></i>${escapeHtml(duration)}</span>` : ''}
+          </div>
+          <div class="dl-actions">${links || '<span class="mono">Tidak ada link unduhan.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderMediaFire(json) {
+    if (!json) return errorResult('Respons MediaFire tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari MediaFire.');
+    const d = json.data || json.result || json;
+    if (!d || !d.url) return errorResult('Format respons MediaFire tidak dikenali.');
+
+    const fileUrl = safeUrl(d.url);
+    return `
+      <div class="download-card">
+        ${thumbHtml('', 'fas fa-file-zipper')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">MEDIAFIRE</span></div>
+          <div class="dl-title">${escapeHtml(d.title || 'File MediaFire')}</div>
+          <div class="dl-meta">
+            ${d.size ? `<span><i class="fas fa-weight-hanging"></i>${escapeHtml(d.size)}</span>` : ''}
+            ${d.mime ? `<span><i class="fas fa-file"></i>${escapeHtml(d.mime)}</span>` : ''}
+          </div>
+          <div class="dl-actions">
+            ${fileUrl ? `<a class="dl-btn primary-dl js-dl" href="${fileUrl}"><i class="fas fa-download"></i> Unduh File</a>${copyBtnHtml(fileUrl)}`
+                      : '<span class="mono">Tidak ada link unduhan.</span>'}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderFacebook(json) {
+    if (!json) return errorResult('Respons Facebook tidak valid.');
+    if (json.status === false) return errorResult(json.message || json.error || 'Gagal mengambil data dari Facebook.');
+    const meta = json.result?.metadata || {};
+    const dl = json.result?.downloads;
+    if (!Array.isArray(dl?.links)) return errorResult('Format respons Facebook tidak dikenali.');
+
+    let actions = '';
+    let firstUrl = '';
+    dl.links.forEach(item => {
+      const u = safeUrl(item?.url);
+      if (!u) return;
+      const isAudio = /audio/i.test(item.type) || /mp3/i.test(item.quality);
+      const label = isAudio ? 'Audio MP3' : `Video ${[item.type, item.quality].filter(Boolean).join(' ')}`;
+      if (!firstUrl) firstUrl = u;
+      actions += `<a class="dl-btn ${!actions ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas ${isAudio ? 'fa-music' : 'fa-video'}"></i> ${escapeHtml(label)}</a>`;
+    });
+    if (!actions) return errorResult('Link unduhan Facebook tidak ditemukan. Pastikan video bersifat publik.');
+    actions += copyBtnHtml(firstUrl);
+
+    const title = String(meta.description || meta.title || 'Video Facebook');
+    const info = [
+      ['fa-user', meta.author],
+      ['fa-clock', meta.duration],
+      ['fa-eye', Number(meta.viewCount) > 0 ? Number(meta.viewCount).toLocaleString('id-ID') + ' views' : ''],
+      ['fa-expand', meta.resolution ? String(meta.resolution).replace('*', '×') : '']
+    ].filter(([, v]) => v).map(([icon, v]) => `<span><i class="fas ${icon}"></i>${escapeHtml(v)}</span>`).join('');
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(dl.thumbnail, 'fab fa-facebook')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">FACEBOOK</span></div>
+          <div class="dl-title">${escapeHtml(title.length > 90 ? title.slice(0, 90) + '…' : title)}</div>
+          <div class="dl-meta">${info}</div>
+          <div class="dl-actions">${actions}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderPin(json) {
+    if (!json) return errorResult('Respons Pinterest tidak valid.');
+    if (json.status === false) return errorResult(json.message || 'Gagal mengambil data dari Pinterest.');
+    const data = json.data || json.result || json;
+    if (!Array.isArray(data) || !data.length) return errorResult('Media Pinterest tidak ditemukan.');
+
+    let actions = '';
+    let firstUrl = '';
+    data.forEach((it, i) => {
+      const u = safeUrl(it?.url);
+      if (u) { if (!firstUrl) firstUrl = u; actions += `<a class="dl-btn ${i === 0 ? 'primary-dl' : ''} js-dl" href="${u}"><i class="fas fa-image"></i> Gambar ${i+1}</a>`; }
+    });
+    if (firstUrl) actions += copyBtnHtml(firstUrl);
+
+    return `
+      <div class="download-card">
+        ${thumbHtml(data[0]?.url, 'fab fa-pinterest')}
+        <div class="dl-body">
+          <div class="dl-badge-row"><span class="dl-kicker">PINTEREST</span></div>
+          <div class="dl-title">Media Pinterest</div>
+          <div class="dl-meta"><span><i class="fab fa-pinterest"></i>${data.length} media ditemukan</span></div>
+          <div class="dl-actions">${actions || '<span class="mono">Tidak ada gambar.</span>'}</div>
+        </div>
+      </div>`;
+  }
+
+  const renderers = {
+    youtube: renderYoutube, apple: renderApple, instagram: renderInstagram, capcut: renderCapcut,
+    tiktok: renderTikTok, spotify: renderSpotify, mediafire: renderMediaFire, facebook: renderFacebook, pin: renderPin
+  };
+
+  function prepareDownloads(service) {
+    const title = resultPanel.querySelector('.dl-title')?.textContent.trim() || serviceNames[service];
+    resultPanel.querySelectorAll('a.js-dl').forEach(a => {
+      const source = a.getAttribute('href');
+      const label = a.textContent.trim();
+      const params = new URLSearchParams({ url: source, name: `${title.slice(0, 60)} - ${label}` });
+      if (/mp3|audio/i.test(label)) params.set('ext', 'mp3');
+      else if (/mp4|video/i.test(label)) params.set('ext', 'mp4');
+      else if (/gambar|foto/i.test(label)) params.set('ext', 'jpg');
+      a.setAttribute('href', '/api/download?' + params);
+      a.setAttribute('data-source', source);
+    });
+  }
+
+  resultPanel.addEventListener('click', e => {
+    const link = e.target.closest('a.js-dl');
+    if (!link) return;
+    if (resultPanel.dataset.demo === '1') {
+      e.preventDefault();
+      showToast('Ini data contoh, tidak ada file untuk diunduh', 'fa-circle-info');
+      return;
+    }
+    if (link.classList.contains('busy')) { e.preventDefault(); return; }
+    link.classList.add('busy');
+    setTimeout(() => link.classList.remove('busy'), 3000);
+    showToast('Menyiapkan unduhan…', 'fa-download');
+  });
+
+  resultPanel.addEventListener('click', e => {
+    const copyBtn = e.target.closest('.copy-dl-btn');
+    if (copyBtn) copyTextToClipboard(copyBtn.dataset.copyUrl);
+  });
+
+  function runPreviewDemo() {
+    const sample = demoPayloads[currentService] || demoPayloads.apple;
+    urlInput.value = sample.url;
+    const render = renderers[currentService];
+    cancelRequest();
+    resultPanel.dataset.demo = '1';
+    resultPanel.innerHTML = render(sample.data);
+    prepareDownloads(currentService);
+    setStatus('DEMO PREVIEW', 'var(--sky-cyan)');
+    showToast(`Preview ${serviceNames[currentService]} dimuat`, 'fa-bolt');
+  }
+
+  demoNavBtn.addEventListener('click', runPreviewDemo);
+  demoInlineBtn.addEventListener('click', runPreviewDemo);
+
+  function timeAgo(ts) {
+    if (!ts) return 'Baru saja';
+    const diffSec = Math.floor((Date.now() - ts) / 1000);
+    if (diffSec < 60) return 'Baru saja';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m lalu`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}j lalu`;
+    return `${Math.floor(diffHr / 24)}h lalu`;
+  }
+
+  function loadHistory() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem('nexus_history') || '[]');
+      history = Array.isArray(parsed)
+        ? parsed.filter(h => h && typeof h.url === 'string' && Object.hasOwn(serviceNames, h.service)).slice(0, 20)
+        : [];
+    } catch { history = []; }
+    renderHistory();
+  }
+
+  function saveHistory() {
+    try { localStorage.setItem('nexus_history', JSON.stringify(history.slice(0, 20))); } catch {}
+  }
+
+  function addHistory(url, service) {
+    history = history.filter(h => !(h.url === url && h.service === service));
+    history.unshift({ url, service, time: Date.now() });
+    if (history.length > 20) history = history.slice(0, 20);
+    saveHistory();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    historyCount.textContent = history.length;
+    const query = historySearch.value.trim().toLowerCase();
+    const filtered = history
+      .map((item, originalIndex) => ({ ...item, originalIndex }))
+      .filter(h => {
+        if (!query) return true;
+        const sName = (serviceNames[h.service] || h.service).toLowerCase();
+        return h.url.toLowerCase().includes(query) || sName.includes(query);
+      });
+
+    if (!filtered.length) {
+      historyList.innerHTML = `<div class="history-empty">${query ? 'Tidak ada riwayat yang cocok.' : 'Riwayat unduhan masih kosong.'}</div>`;
+      return;
+    }
+
+    historyList.innerHTML = filtered.map(h => `
+      <div class="history-item" data-index="${h.originalIndex}" title="${escapeHtml(h.url)}">
+        <i class="${serviceIcons[h.service] || 'fas fa-link'} srv-ico"></i>
+        <div class="history-main">
+          <span class="history-url">${escapeHtml(h.url)}</span>
+          <div class="history-sub">
+            <span>${escapeHtml(serviceNames[h.service] || h.service)}</span>
+            <span>•</span>
+            <span>${timeAgo(h.time)}</span>
+          </div>
+        </div>
+        <button type="button" class="history-del" data-del-index="${h.originalIndex}" title="Hapus item ini" aria-label="Hapus riwayat">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>`).join('');
+  }
+
+  historySearch.addEventListener('input', renderHistory);
+
+  historyList.addEventListener('click', e => {
+    const delBtn = e.target.closest('.history-del');
+    if (delBtn) {
+      e.stopPropagation();
+      const idx = Number(delBtn.dataset.delIndex);
+      if (!Number.isNaN(idx)) {
+        history.splice(idx, 1);
+        saveHistory();
+        renderHistory();
+        showToast('Item riwayat dihapus', 'fa-trash');
+      }
+      return;
+    }
+    const el = e.target.closest('.history-item');
+    if (!el) return;
+    const h = history[Number(el.dataset.index)];
+    if (!h) return;
+    activateService(h.service);
+    cancelRequest();
+    urlInput.value = h.url;
+    urlInput.blur();
+    emptyResult('Tautan dimuat. Tekan Download untuk memprosesnya.');
+    showToast('Tautan dimuat dari riwayat', 'fa-clock-rotate-left');
+  });
+
+  clearHistoryBtn.addEventListener('click', () => {
+    if (!history.length) return;
+    history = [];
+    saveHistory();
+    renderHistory();
+    showToast('Semua riwayat dihapus', 'fa-trash');
+  });
+
+  let activeRequest = null;
+
+  function cancelRequest() {
+    resultPanel.dataset.demo = '';
+    if (!activeRequest) return;
+    const request = activeRequest;
+    activeRequest = null;
+    request.abort();
+    setLoading(false);
+  }
+
+  function resetInput() {
+    cancelRequest();
+    urlInput.value = '';
+    emptyResult();
+  }
+
+  async function fetchDownload() {
+    if (activeRequest) return;
+    urlInput.blur();
+    const raw = extractUrl(urlInput.value);
+    if (!raw) { errorResult('Harap masukkan URL terlebih dahulu.'); return; }
+    if (!/^https?:\/\//i.test(raw)) { errorResult('URL tidak dikenali. Tempel link lengkap yang diawali https://'); return; }
+    urlInput.value = raw;
+
+    const detected = detectService(raw);
+    if (detected && detected !== currentService) {
+      activateService(detected);
+      showToast(`Layanan terdeteksi: ${serviceNames[detected]}`, 'fa-wand-magic-sparkles');
+    }
+
+    const service = currentService;
+    resultPanel.dataset.demo = '';
+    const controller = new AbortController();
+    activeRequest = controller;
+    setLoading(true);
+    resultPanel.innerHTML = `<div class="empty-box"><i class="fas fa-spinner fa-spin"></i><p>Menghubungi endpoint ${escapeHtml(serviceNames[currentService])}…</p></div>`;
+
+    // Bangun endpoint. TikTok (TikWM) hanya butuh parameter ?url=
+    let originalEndpoint;
+    if (service === 'youtube') {
+      const quality = qualitySelect.value || '720p';
+      originalEndpoint = `${currentApi.replace(/\/$/, '')}?url=${encodeURIComponent(raw)}&type=video&quality=${encodeURIComponent(quality)}`;
+    } else {
+      originalEndpoint = `${currentApi.replace(/\/$/, '')}?url=${encodeURIComponent(raw)}`;
+    }
+    const endpoint = `/api/proxy?url=${encodeURIComponent(originalEndpoint)}`;
+
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+    try {
+      const res = await fetch(endpoint, { headers: { Accept: 'application/json' }, signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `HTTP ${res.status}`);
+      }
+
+      const json = await res.json();
+      if (activeRequest !== controller) return;
+      resultPanel.innerHTML = renderers[service](json);
+      prepareDownloads(service);
+
+      if (resultPanel.querySelector('.download-card')) {
+        setStatus('READY', 'var(--acid-lime)');
+        addHistory(raw, service);
+        showToast('Media siap diunduh!', 'fa-check');
+      } else {
+        setStatus('INVALID', 'var(--coral-pink)');
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (activeRequest !== controller) return;
+      if (err.name === 'AbortError') {
+        errorResult('Waktu permintaan habis (20 detik). Server sedang sibuk, silakan coba lagi.');
+      } else {
+        errorResult(`Gagal mengambil data: ${err.message}. Coba lagi sebentar lagi.`);
+      }
+      showToast('Gagal memproses', 'fa-triangle-exclamation');
+    } finally {
+      clearTimeout(timeoutId);
+      if (activeRequest === controller) {
+        activeRequest = null;
+        setLoading(false);
+      }
+    }
+  }
+
+  fetchBtn.addEventListener('click', fetchDownload);
+  urlInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); fetchDownload(); }
+    else if (e.key === 'Escape') resetInput();
+  });
+
+  function applyPasted(text) {
+    cancelRequest();
+    urlInput.value = extractUrl(text);
+    urlInput.dispatchEvent(new Event('input'));
+    emptyResult('Link ditempel. Tekan Download untuk memprosesnya.');
+    showToast('Link ditempel', 'fa-paste');
+  }
+
+  async function handlePasteFromClipboard() {
+    urlInput.blur();
+    try {
+      const txt = await navigator.clipboard.readText();
+      if (txt.trim()) applyPasted(txt);
+      else showToast('Clipboard kosong', 'fa-circle-info');
+    } catch {
+      showToast('Izinkan akses clipboard, atau tekan lama kolom link', 'fa-circle-info');
+    }
+  }
+
+  pasteBtn.addEventListener('click', handlePasteFromClipboard);
+  clearBtn.addEventListener('click', () => { urlInput.blur(); resetInput(); });
+
+  document.addEventListener('paste', e => {
+    if (e.target.closest?.('input, textarea')) return;
+    const text = e.clipboardData?.getData('text');
+    if (text?.trim()) applyPasted(text);
+  });
+
+  function applyTheme(theme) {
+    document.body.classList.toggle('dark', theme === 'dark');
+    themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    try { localStorage.setItem('nexus_theme', theme); } catch {}
+  }
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
+  });
+
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => btn.parentElement.classList.toggle('open'));
+  });
+
+  (function init() {
+    let saved = null;
+    try { saved = localStorage.getItem('nexus_theme'); } catch {}
+    applyTheme(saved || 'light');
+    loadHistory();
+    activateService('apple');
+    emptyResult();
+  })();
+})();
+</script>
+</body>
+</html>
