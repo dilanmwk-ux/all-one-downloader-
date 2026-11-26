@@ -14,17 +14,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Parameter URL wajib diisi' });
   }
 
-  // 3. Keamanan: Cegah proxy terbuka. Hanya izinkan domain api.nexadev.my.id
+  // 3. Keamanan: Cegah proxy terbuka. Daftar domain yang diizinkan.
   try {
     const parsedUrl = new URL(url);
-    if (parsedUrl.hostname !== 'api.nexadev.my.id') {
+    const allowedHosts = [
+      'api.nexadev.my.id',
+      'www.tikwm.com',
+      'tikwm.com'
+    ];
+    
+    if (!allowedHosts.includes(parsedUrl.hostname)) {
       return res.status(403).json({ error: 'Domain tidak diizinkan' });
     }
   } catch (e) {
     return res.status(400).json({ error: 'Format URL tidak valid' });
   }
 
-  // 4. Lakukan Fetch ke API NexaDev
+  // 4. Lakukan Fetch ke API
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -43,7 +49,12 @@ export default async function handler(req, res) {
     // 5. Kembalikan data dengan Header CORS terbuka
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
-    if (!response.ok && !data.error) data.error = data.message || `Server API error (HTTP ${response.status})`;
+    
+    // TikWM menggunakan "code" dan "msg", bukan "status" dan "error"
+    if (!response.ok && !data.error && !data.msg) {
+      data.error = `Server API error (HTTP ${response.status})`;
+    }
+    
     return res.status(response.status).json(data);
 
   } catch (error) {
