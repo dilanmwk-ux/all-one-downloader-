@@ -1,3 +1,5 @@
+import { checkLimit } from './_limit.js';
+
 export default async function handler(req, res) {
   // 1. Tangani Preflight CORS
   if (req.method === 'OPTIONS') {
@@ -29,6 +31,14 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     return res.status(400).json({ error: 'Format URL tidak valid' });
+  }
+
+  // Batas 30 request per menit per IP
+  const ip = String(req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
+  const limit = await checkLimit('proxy', ip, 30);
+  if (!limit.ok) {
+    res.setHeader('Retry-After', String(limit.retryAfter));
+    return res.status(429).json({ error: `Terlalu banyak permintaan. Coba lagi dalam ${limit.retryAfter} detik.` });
   }
 
   // 4. Lakukan Fetch ke API
