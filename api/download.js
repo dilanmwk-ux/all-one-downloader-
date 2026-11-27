@@ -1,3 +1,5 @@
+import { checkLimit } from './_limit.js';
+
 export const config = { runtime: 'edge' };
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
@@ -33,6 +35,11 @@ export default async function handler(req) {
   if (req.method !== 'GET') return fail(405, 'Metode tidak diizinkan.');
   // Jangan biarkan situs lain menumpang bandwidth proxy ini
   if (req.headers.get('sec-fetch-site') === 'cross-site') return fail(403, 'Akses dari situs lain ditolak.');
+
+  // Batas 60 request per menit per IP (pemutar video juga bisa memakai jalur ini)
+  const ip = (req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
+  const limit = await checkLimit('download', ip, 60);
+  if (!limit.ok) return fail(429, `Terlalu banyak permintaan. Coba lagi dalam ${limit.retryAfter} detik.`);
 
   const params = new URL(req.url).searchParams;
   let target;
