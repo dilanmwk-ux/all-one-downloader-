@@ -1,4 +1,4 @@
-const CACHE = 'aio-v23';
+const CACHE = 'aio-v24';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'manifest.webmanifest', 'icon-192.png'])).then(() => self.skipWaiting()));
 });
