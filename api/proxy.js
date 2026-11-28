@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       'tikwm.com'
     ];
     
-    if (!allowedHosts.includes(parsedUrl.hostname)) {
+    if (parsedUrl.protocol !== 'https:' || parsedUrl.port || !allowedHosts.includes(parsedUrl.hostname)) {
       return res.status(403).json({ error: 'Domain tidak diizinkan' });
     }
   } catch (e) {
